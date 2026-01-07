@@ -8,44 +8,37 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # QUAN TRỌNG: Cấp quyền cho GitHub Actions được phép sửa code và push lại
     permissions:
       contents: write
       packages: write
       
     steps:
-      # 1. Lấy code từ kho chứa về
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Lấy toàn bộ lịch sử git để đảm bảo việc push không bị lỗi
           fetch-depth: 0
 
-      # 2. Cài đặt Node.js và cấu hình registry
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      # Bước này cài cả devDependencies
       - name: Install dependencies
-        run: npm ci
+        # run: npm ci
+        run: npm install
 
-      # 4. Chạy các lệnh build của bạn
       - name: Generate Barrels
         run: npm run generate-barrels
 
       - name: Build project
         run: npm run build
 
-      # Cấu hình Git cho Robot (để nó có thể commit việc đổi version)
       - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      # Tự động tăng version và Push ngược lại GitHub
       - name: Bump version and Push
         run: |
           # 1. Tăng version (patch: 1.0.0 -> 1.0.1)
@@ -58,7 +51,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Cuối cùng mới Publish phiên bản mới đó lên NPM
       - name: Publish to NPM
         run: npm publish
         env:
