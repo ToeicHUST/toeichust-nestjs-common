@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# ⚠️  WARNING: DO NOT DELETE OR MODIFY THIS FILE
+# This hook runs before pushing to remote repository
+# Ensures the project builds successfully before push
+# Prevents broken code from being pushed to the repository
+
+echo "🔍 Checking code quality before push..."
+echo ""
+
+# Build project
+echo "🏗️  Building project..."
+npm run build || {
+  echo ""
+  echo "❌ Build failed. Please fix build errors before pushing."
+  echo "💡 Run 'npm run build' locally to see the errors."
+  exit 1
+}
+
+echo ""
+echo "✅ All checks passed! Proceeding with push..."
+echo ""
+
